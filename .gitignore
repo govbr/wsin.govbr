@@ -2,11 +2,16 @@
 ################
 *~
 *.orig
+src/example/*
 
 # Compiled source #
 ###################
 *.class
 bin/*
+
+# Documentacao #
+################
+site/*
 
 # Arquivos especificos #
 ########################
