@@ -81,21 +81,122 @@
 </div>
           <div role="main">
             <div class="section">
-              <h1 id="welcome-to-mkdocs">Welcome to MkDocs</h1>
-<p>For full documentation visit <a href="http://mkdocs.org">mkdocs.org</a>.</p>
-<h2 id="commands">Commands</h2>
-<ul>
-<li><code>mkdocs new [dir-name]</code> - Create a new project.</li>
-<li><code>mkdocs serve</code> - Start the live-reloading docs server.</li>
-<li><code>mkdocs build</code> - Build the documentation site.</li>
-<li><code>mkdocs help</code> - Print this help message.</li>
-</ul>
-<h2 id="project-layout">Project layout</h2>
-<pre><code>mkdocs.yml    # The configuration file.
-docs/
-    index.md  # The documentation homepage.
-    ...       # Other markdown pages, images and other files.
+              <h1 id="wsingovbr">WSIN.govbr</h1>
+<p>Biblioteca para acessar o webservice da Imprensa Nacional para publicação e acompanhamento de envio de matérias para o Diário Oficial da União conforme <a href="http://catalogo.governoeletronico.gov.br/">documentação do webservice</a>. Essa biblioteca foi compilada para Java 7.</p>
+<h1 id="exemplo-de-uso-da-biblioteca">Exemplo de uso da biblioteca</h1>
+<p>A biblioteca deve estar no classpath da sua aplicação e deve existir um arquivo chamado <strong>credentials_wsin.properties</strong> com seu usuário e senha para acessar o sistema.</p>
+<h2 id="exemplo-simples">Exemplo simples</h2>
+<p>Com o jar na raiz execute o seguinte código no terminal:</p>
+<pre><code>    &gt; java -cp wsin_govbr_1.0.0.jar:.:example/ example.Principal
 </code></pre>
+<p>Onde o Principal.java que está dentro da pasta <em>example</em> é:</p>
+<pre><code class="java">package example;
+
+import java.io.IOException;
+import java.net.URL;
+import java.util.List;
+
+import javax.xml.datatype.DatatypeConfigurationException;
+
+import br.gov.in.ws.ArrayOfDadosOrgao;
+import br.gov.in.ws.DadosOrgao;
+import br.gov.in.ws.RespostaConsultaTodosOrgaosPermitidos;
+import br.gov.in.ws.ServicoIN;
+import br.gov.in.ws.ServicoINPortType;
+
+public class Principal {
+
+    public static void main( String[] args) {
+        try {
+            new Principal().callWebService();
+        } catch (DatatypeConfigurationException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void callWebService() throws DatatypeConfigurationException, IOException {
+
+        ServicoIN servicoIN = new ServicoIN(new URL(&quot;https://homologwsincom.in.gov.br/services/servicoIN?wsdl&quot;));
+
+        ServicoINPortType servicoINPortType = servicoIN.getServicoINHttpPort();
+
+        RespostaConsultaTodosOrgaosPermitidos respostaConsultaTodosOrgaosPermitidos = servicoINPortType.consultaTodosOrgaosPermitidos();
+
+        ArrayOfDadosOrgao arrayOfDadosOrgao = respostaConsultaTodosOrgaosPermitidos.getOrgao();
+
+        List&lt;DadosOrgao&gt; arrayListDadosOrgao =  arrayOfDadosOrgao.getDadosOrgao();
+
+        for (DadosOrgao dadosOrgao : arrayListDadosOrgao) {
+            System.out.print(&quot;Nome: &quot;+dadosOrgao.getNomeOrgao()+&quot; - &quot;);
+            System.out.println(&quot;IDSiorg: &quot;+dadosOrgao.getIdentificadorSIORG());
+        }
+   }
+}
+</code></pre>
+
+<p>Dentro da pasta <em>example</em> possui um arquivo chamado de credentials_wsin.properties que contem duas propriedades:</p>
+<pre><code>#User - Substitua pelo login e senha correto.
+wsin.user=_meu_usuario_
+wsin.pass=_senha_do_usuario_
+</code></pre>
+
+<p>O programa irá listar todos os órgãos permitidos para acesso ao diário oficial da união.</p>
+<h2 id="exemplo-de-envio-de-materia">Exemplo de envio de matéria</h2>
+<pre><code class="java">        DadosOficioPreview dados = new DadosOficioPreview();
+
+        GregorianCalendar gregcalendar = new GregorianCalendar();
+        ArrayOfDadosMateriaRequest arrayOfDadosMateriaRequest = new ArrayOfDadosMateriaRequest();
+
+        DadosMateriaRequest dadosMateriaRequest = new DadosMateriaRequest();
+
+        dadosMateriaRequest.setConteudo(&quot;{\\rtf1\\ansi\\deff0{\\fonttbl{\\f0 Times New Roman;}}{##ATO EXTRATO DE CONV\\u202?NIO\\par}{Esp\\u233?cie: Conv\\u234?nio N\\u186? 900511/2011. N\\u186? Processo: 23628073161201373. Convenentes: ASSOCIACAO DAS OBRAS PAVONIANAS DE ASSISTENCIAConcedente : MINISTERIO DO PLANEJAMENTO, ORCAMENTO E GESTAO, Unidade Gestora: 201013, Gest\\u227?o: 00001. Convenente : ASSOCIACAO DAS OBRAS PAVONIANAS DE ASSISTENCIA, CNPJ n\\u186? 62382395000604. Homologa\\u231?\\u227?o de Comprovantes de Execu\\u231?\\u227?o. Valor Total: R$ 100.000,00, Valor de Contrapartida: R$ 10.000,00, Valor a ser transferido ou descentralizado no exerc\\u237?cio em curso : R$ 90.000,00, Vig\\u234?ncia: 26/12/2011 a 26/12/2012. Data de Assinatura: 26/12/2011. Signat\\u225?rios: Concedente : CONCEDENTE PESSOA, CPF n\\u186? 111.111.111-11, Convenente : CONVENENTE PESSOA, CPF n\\u186? 999.999.999-99, \\par}}&quot;);
+        dadosMateriaRequest.setNUP(&quot;23628073161201373&quot;);
+        dadosMateriaRequest.setIdentificadorNorma(104);
+        dadosMateriaRequest.setSiorgMateria(3236);
+
+        arrayOfDadosMateriaRequest.getDadosMateriaRequest().add(dadosMateriaRequest);
+
+        dados.setCPF(&quot;11111111111&quot;);
+        dados.setDataPublicacao(DatatypeFactory.newInstance().newXMLGregorianCalendar(gregcalendar));
+        dados.setMateria(arrayOfDadosMateriaRequest);
+        dados.setIdentificadorJornal(1);
+        dados.setUG(&quot;2256&quot;);
+        dados.setEmpenho(&quot;2015NE000123&quot;);
+        dados.setIdentificadorTipoPagamento(89);
+
+
+
+        ValidacaoPreview validacaoPreview = servicoINPortType.oficioPreview(dados);
+
+        ArrayOfDadosMateriaResponse arrayOfDadosMateriaResponse = validacaoPreview.getPublicacaoPreview();
+        List&lt;DadosMateriaResponse&gt; dadosMateriaResponses = arrayOfDadosMateriaResponse.getDadosMateriaResponse();
+        String pdf = null;
+        for (DadosMateriaResponse dadosMateriaResponse : dadosMateriaResponses) {
+            pdf = dadosMateriaResponse.getPdf();
+            Decoder decoder = Base64.getMimeDecoder();
+            byte[] decodedBytes = decoder.decode(pdf.getBytes(StandardCharsets.UTF_8));
+
+            File file = new File(&quot;preview_materia.pdf&quot;);;
+            FileOutputStream fop = new FileOutputStream(file);
+
+            fop.write(decodedBytes);
+            fop.flush();
+            fop.close();
+
+        }
+
+</code></pre>
+
+<p>O programa irá enviar a matéria e salvar o preview em pdf com o nome <strong>preview_materia.pdf</strong>. Caso a matéria esteja correta deve-se confirmar o envio da matéria:</p>
+<pre><code class="java">        servicoINPortType.oficioConfirmacao(dadosOficioConfirmacao);
+</code></pre>
+
+<p>E deve-se preencher os dados de confirmação conforme a documentação no item <strong>4.2. Interface de Confirmação de envio de Ofício</strong></p>
+<blockquote>
+<p>Atenção de o RTF deve estar conforme <a href="http://portal.in.gov.br/servicos/legislacao-de-publicacao/portaria-no-268.pdf">portaria 268 de 2009 da Imprensa Nacional</a></p>
+</blockquote>
 
             </div>
           </div>
