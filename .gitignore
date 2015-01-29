@@ -1,0 +1,18 @@
+# Edited files #
+################
+*~
+*.orig
+src/example/*
+# Compiled source #
+###################
+*.class
+bin/*
+# Documentacao #
+################
+site/*
+# Arquivos especificos #
+########################
+.settings/*
+build_jar.jardesc
+.classpath
+.project
