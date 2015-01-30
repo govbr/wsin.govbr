@@ -1,4 +1,4 @@
 site_name: WSIN.govbr
 site_description: Biblioteca para acessar o webservice da Imprensa Nacional para publicação e acompanhamento de envio de matérias para o Diário Oficial da União.
-theme: readthedocs
+theme: mkdocs
 repo_url: https://github.com/govbr/wsin.govbr
