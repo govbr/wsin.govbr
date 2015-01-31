@@ -1,7 +1,7 @@
 # WSIN.govbr
 
 Biblioteca para acessar o webservice da Imprensa Nacional para publicação e acompanhamento de envio de matérias para o Diário Oficial da União conforme [documentação do webservice](http://catalogo.governoeletronico.gov.br/). Essa biblioteca foi compilada para Java 7.
-
+Para mais informações sobre essa biblioteca veja a [documentação de uso](http://govbr.github.io/wsin.govbr).
 
 
 # Exemplo de uso da biblioteca
