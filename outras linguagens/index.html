@@ -9,7 +9,7 @@
         
         <link rel="shortcut icon" href="../img/favicon.ico">
 
-        <title>Instalacao do ssl java - WSIN.govbr</title>
+        <title>Outras linguagens - WSIN.govbr</title>
 
         <link href="../css/bootstrap-custom.min.css" rel="stylesheet">
         <link href="../css/font-awesome-4.0.3.css" rel="stylesheet">
@@ -53,14 +53,14 @@
                 <ul class="nav navbar-nav">
                 
                 
-                    <li class="active">
-                        <a href=".">Instalacao do ssl java</a>
+                    <li >
+                        <a href="../instalacao do ssl java">Instalacao do ssl java</a>
                     </li>
                 
                 
                 
-                    <li >
-                        <a href="../outras linguagens">Outras linguagens</a>
+                    <li class="active">
+                        <a href=".">Outras linguagens</a>
                     </li>
                 
                 
@@ -73,12 +73,12 @@
                 
                 
                 <li >
-                    <a rel="next" href="..">
+                    <a rel="next" href="../instalacao do ssl java">
                         <i class="fa fa-arrow-left"></i> Previous
                     </a>
                 </li>
-                <li >
-                    <a rel="prev" href="../outras linguagens">
+                <li class="disabled">
+                    <a rel="prev" >
                         Next <i class="fa fa-arrow-right"></i>
                     </a>
                 </li>
@@ -104,57 +104,37 @@
                 <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
     <ul class="nav bs-sidenav">
     
-        <li class="main active"><a href="#problemas-ao-se-conectar-devido-a-falta-de-certificado-ssl">Problemas ao se conectar devido a falta de certificado SSL</a></li>
-        
-            <li><a href="#1-instalar-o-installcertjava">1. Instalar o InstallCert.java</a></li>
-        
-            <li><a href="#2-compilar-o-installcert">2. Compilar o InstallCert</a></li>
-        
-            <li><a href="#3-executar-o-installcert">3. Executar o InstallCert</a></li>
-        
-            <li><a href="#4-copiar-arquivo-jssecacerts">4. Copiar arquivo jssecacerts</a></li>
+        <li class="main active"><a href="#em-python">Em Python</a></li>
         
     
     </ul>
 </div></div>
                 <div class="col-md-9" role="main">
 
-<h1 id="problemas-ao-se-conectar-devido-a-falta-de-certificado-ssl">Problemas ao se conectar devido a falta de certificado SSL</h1>
-<p>O certificado ICP-Brasil não é instalado por default nos browsers e nos Sistemas Operacionais.<a href="https://bugzilla.mozilla.org/show_bug.cgi?id=438825" title="Add CA Root certificate (Brazil's National PKI)">1</a> Portanto é necessário instalar manualmente o certificado do ambiente de homologação e produção do serviço do WSIN.govbr.</p>
-<p>Para o ambiente Java podemos seguir os seguintes passos:</p>
-<h2 id="1-instalar-o-installcertjava">1. Instalar o InstallCert.java</h2>
-<p>Abrir um terminal e digitar:</p>
-<pre><code>mkdir InstallCert
-cd InstallCert
-wget http://opentox.ntua.gr/files/InstallCert.zip
-unzip InstallCert
+<h1 id="em-python">Em Python</h1>
+<p>Pode-se usar a biblioteca suds que não gera classes.</p>
+<p>Uma forma de utilização é:</p>
+<pre><code class="python">from suds.client import Client
+from suds.wsse import *
+from suds.xsd.doctor import Import, ImportDoctor
+url = 'https://homologwsincom.in.gov.br/services/servicoIN?wsdl'
+security = Security()
+ns = 'http://data.xfire.ws.incom'
+imp = Import(ns=ns, location=url)
+imp.filter.add('http://data.xfire.ws.incom')
+imp.filter.add('http://xfire.ws.incom')
+doctor = ImportDoctor(imp)
+
+token = UsernameToken('USUARIO', 'SENHA')
+security.tokens.append(token)
+
+client = Client(url, doctor=doctor)
+client.set_options(wsse=security)
+
+client.service.ConsultaTodosFeriado()
 </code></pre>
 
-<h2 id="2-compilar-o-installcert">2. Compilar o InstallCert</h2>
-<p>No terminal:</p>
-<pre><code>javac InstallCert
-</code></pre>
-
-<h2 id="3-executar-o-installcert">3. Executar o InstallCert</h2>
-<p>No terminal para o de homologação:</p>
-<pre><code>java InstallCert homologwsincom.in.gov.br:443
-</code></pre>
-
-<p>Ou para o de produção:</p>
-<pre><code>java InstallCert wsincom.in.gov.br:443
-</code></pre>
-
-<p>Escolhendo a opção <strong>1</strong> quando perguntado se deve adicionar o certificado.
-Com isso vai ser criado um arquivo chamado <strong>jssecacerts</strong> com os certificados.</p>
-<h2 id="4-copiar-arquivo-jssecacerts">4. Copiar arquivo <strong>jssecacerts</strong></h2>
-<blockquote>
-<p>Atenção: se já possuir um arquivo jssecacerts não sobrescreva o mesmo. Adicione essa nova entrada no seu &gt;arquivo já existente fazendo um backup antes de qualquer modificação no arquivo.</p>
-</blockquote>
-<p>No terminal:</p>
-<pre><code>cp jssecacerts $JAVA_HOME\jre\lib\security
-</code></pre>
-
-<p>Esse passo-a-passo foi adaptado do <a href="http://www.mkyong.com/webservices/jax-ws/suncertpathbuilderexception-unable-to-find-valid-certification-path-to-requested-target/">post de mkyong</a></p>
+<p>Com o <code>print client</code> você pode ver os métodos e as classes criadas.</p>
 </div>
             
         </div>
